@@ -16,6 +16,7 @@
   const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+  const spoilerFree = (d) => (d || "").replace(/\s*\([^)]*\)/g, "").replace(/\b(?:from|since|in|until|between|born|died|b\.|d\.)\s+(?:1[89]|20)\d\d(?:\s*(?:to|and|–|-)\s*(?:1[89]|20)\d\d)?/gi, "").replace(/\b(?:1[89]|20)\d\d\b/g, "").replace(/\s{2,}/g, " ").replace(/\s+([,;.])/g, "$1").replace(/[,;\s]+$/, "").trim();
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
   // Pub fame, not world fame. Anchors should be the people a British pub table can picture:
@@ -348,7 +349,8 @@
   function renderSuggest(items, fromWikidata = false) {
     sugItems = items; sugIndex = items.length ? 0 : -1;
     if (!items.length) return closeSuggest();
-    el.suggest.innerHTML = items.map((p, i) => `<li role="option" data-i="${i}" class="${i === 0 ? "active" : ""}${fromWikidata ? " wd" : ""}"><span>${esc(p.name)}${fromWikidata ? ` <small class="tag">${p.dob.slice(0, 4)}</small>` : ""}</span><span class="d">${esc(p.desc || "")}</span></li>`).join("");
+    // Nothing shown before a guess is committed may hint at a date: no year tag, and years scrubbed from descriptions.
+    el.suggest.innerHTML = items.map((p, i) => `<li role="option" data-i="${i}" class="${i === 0 ? "active" : ""}${fromWikidata ? " wd" : ""}"><span>${esc(p.name)}${fromWikidata ? ` <small class="tag">Wikidata</small>` : ""}</span><span class="d">${esc(spoilerFree(p.desc))}</span></li>`).join("");
     el.suggest.hidden = false;
   }
   function closeSuggest() { el.suggest.hidden = true; el.suggest.innerHTML = ""; sugItems = []; sugIndex = -1; }
