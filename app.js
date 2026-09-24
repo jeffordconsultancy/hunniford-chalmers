@@ -205,7 +205,7 @@
   }
   function renderLevel() {
     const lv = run.lv;
-    el.levelName.textContent = `Level ${lv.n}` + (run.daily ? " · Daily" : "");
+    el.levelName.innerHTML = `<span class="lv-num">${String(lv.n).padStart(2, "0")}</span><span class="lv-label">${run.daily ? "Daily · " : ""}${lv.label}</span>`;
     for (const li of el.ladder.children) {
       const r = +li.dataset.rung;
       li.className = r < lv.n ? "done" : r === lv.n ? "now" : "";

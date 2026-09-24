@@ -4,7 +4,8 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 
 const html = readFileSync("index.html", "utf8");
-const css = readFileSync("styles.css", "utf8");
+const fontData = (f) => "data:font/woff2;base64," + readFileSync("fonts/" + f).toString("base64");
+const css = readFileSync("styles.css", "utf8").replace(/url\("fonts\/([^"]+)"\)/g, (_, f) => `url("${fontData(f)}")`);
 const data = readFileSync("data/people.js", "utf8");
 const app = readFileSync("app.js", "utf8");
 const esc = (s) => s.replace(/<\/script/gi, "<\\/script");

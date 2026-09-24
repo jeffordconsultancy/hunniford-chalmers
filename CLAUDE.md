@@ -10,6 +10,7 @@ Pub birthday game as a static website. Read `README.md` first; it has the rules 
 - The year always counts. Boundaries are exclusive. The list is the oracle; unknown names cost nothing.
 - Ladder is `WINDOWS`/`LABELS` at the top of `app.js`: three years down to ten days.
 - High scores are per-device (`localStorage`) behind `scoreStore` in `app.js`; a shared board replaces that object only.
+- Look: editorial (off-white page, ink type, hairline rules, cobalt accent; Instrument Serif display + Archivo UI, self-hosted in `fonts/`). Both colour schemes are first-class; every colour is a token on `:root`. Don't reintroduce rounded cards or a dark-green pub theme.
 - The name is spelt "Hunniford Chalmers". The About page keeps the not-affiliated line.
 
 ## Working on it
