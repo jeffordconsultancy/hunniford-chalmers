@@ -6,6 +6,21 @@
 <title>Hunniford Chalmers</title>
 <meta name="description" content="The pub birthday game. Two famous people, two birthdays. Name someone born between them. Ten levels, from three years apart down to ten days.">
 <meta name="theme-color" content="#0f2a1f">
+<link rel="canonical" href="https://hunnifordchalmers.com/">
+<!-- Link previews (WhatsApp, iMessage, LinkedIn, Slack, X) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hunniford Chalmers">
+<meta property="og:title" content="Hunniford Chalmers">
+<meta property="og:description" content="The pub birthday game. Two famous people, two birthdays. Name someone born between them. Ten levels, from three years apart down to ten days.">
+<meta property="og:url" content="https://hunnifordchalmers.com/">
+<meta property="og:image" content="https://hunnifordchalmers.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hunniford Chalmers — name someone born between two famous people's birthdays">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hunniford Chalmers">
+<meta name="twitter:description" content="The pub birthday game. Name someone born between two famous people's birthdays. Ten levels, three years down to ten days.">
+<meta name="twitter:image" content="https://hunnifordchalmers.com/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f2a1f'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23e8a33d' font-family='Georgia,serif' font-weight='bold'%3EHC%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -27,6 +42,7 @@
       <button class="btn primary big" data-action="play">Play</button>
       <button class="btn big" data-action="daily" id="btn-daily">Daily</button>
     </div>
+    <button class="link small" data-go="scores">High scores</button>
 
     <p class="fine" id="data-count"></p>
   </section>
@@ -73,6 +89,15 @@
   <section id="screen-over" class="screen" hidden>
     <h2 class="title small-title" id="over-title"></h2>
     <p class="lede" id="over-sub"></p>
+    <div class="arcade" id="hs-entry" hidden>
+      <div class="arcade-head">High score</div>
+      <div class="arcade-blink">Enter your initials</div>
+      <form class="initials" id="hs-form" autocomplete="off">
+        <input id="hs-initials" type="text" maxlength="3" inputmode="latin" autocapitalize="characters" spellcheck="false" placeholder="AAA" aria-label="Your initials, three letters">
+        <button class="btn primary" type="submit">Enter</button>
+      </form>
+    </div>
+    <div class="arcade" id="hs-placed" hidden></div>
     <div class="anchors compact" id="over-anchors"></div>
     <h3 class="h3">You could have said</h3>
     <ul class="answers" id="over-answers"></ul>
@@ -81,6 +106,23 @@
       <button class="btn big" data-action="share" id="btn-share">Share</button>
     </div>
     <pre class="share-preview" id="share-preview" hidden></pre>
+  </section>
+
+  <!-- HIGH SCORES -->
+  <section id="screen-scores" class="screen" hidden>
+    <h2 class="title small-title">High scores</h2>
+    <p class="lede">Top ten runs on this device. Arcade rules: reach the table, enter three letters.</p>
+    <div class="arcade">
+      <table class="scores" id="scores-table">
+        <thead><tr><th>#</th><th>Name</th><th>Level</th><th>Lives</th><th>When</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="fine" id="scores-empty" hidden>No scores yet. Go on, then.</p>
+    </div>
+    <div class="home-actions">
+      <button class="btn primary big" data-action="play">Play</button>
+      <button class="btn" data-go="home">Back</button>
+    </div>
   </section>
 
   <!-- ABOUT -->

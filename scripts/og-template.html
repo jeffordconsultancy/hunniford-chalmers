@@ -1,0 +1,37 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: #0f2a1f;
+    background-image: radial-gradient(ellipse at 30% 20%, #1a4030 0%, #0f2a1f 65%);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #f3e9d2; position: relative;
+  }
+  .title { position: absolute; left: 80px; top: 92px; font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 112px; line-height: .92; letter-spacing: -1px; }
+  .title span { color: #e8a33d; }
+  .sub { position: absolute; left: 82px; top: 352px; font-size: 34px; line-height: 1.3; color: #c9bda3; max-width: 640px; }
+  .sub em { font-style: normal; color: #e8a33d; font-weight: 600; }
+  .cards { position: absolute; right: 80px; top: 120px; display: flex; gap: 22px; align-items: center; }
+  .card { width: 178px; background: #143627; border: 2px solid rgba(243,233,210,.16); border-radius: 18px; padding: 14px; text-align: center; }
+  .tile { width: 150px; height: 150px; border-radius: 12px; margin: 0 auto 12px; display: grid; place-items: center; font-family: Georgia, serif; font-size: 58px; font-weight: 700; color: #e8a33d; background: linear-gradient(135deg, #2a1a0e, #3d2816); }
+  .name { font-weight: 700; font-size: 20px; }
+  .dob { color: #e8a33d; font-weight: 600; font-size: 17px; margin-top: 4px; }
+  .arrow { color: #e8a33d; font-size: 44px; }
+  .q { position: absolute; right: 80px; top: 392px; width: 400px; text-align: center; font-family: Georgia, serif; font-size: 36px; color: #f3e9d2; line-height: 1.15; }
+  .q small { display: block; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; color: #c9bda3; margin-top: 10px; }
+  .foot { position: absolute; left: 82px; bottom: 56px; font-size: 26px; color: #e8a33d; font-weight: 600; letter-spacing: .5px; }
+  .pints { position: absolute; right: 84px; bottom: 50px; font-size: 40px; letter-spacing: 6px; }
+</style></head>
+<body>
+  <div class="title">Hunniford<br><span>Chalmers</span></div>
+  <div class="sub">Two famous people, two birthdays.<br>Name someone born <em>between</em> them.</div>
+  <div class="cards">
+    <div class="card"><div class="tile">GH</div><div class="name">Gloria Hunniford</div><div class="dob">10 April 1940</div></div>
+    <div class="arrow">→</div>
+    <div class="card"><div class="tile">JC</div><div class="name">Judith Chalmers</div><div class="dob">10 October 1935</div></div>
+  </div>
+  <div class="q">Ten levels. Three years<br>down to ten days.<small>The pub game, online</small></div>
+  <div class="foot">hunnifordchalmers.com</div>
+  <div class="pints">🍺🍺🍺</div>
+</body></html>

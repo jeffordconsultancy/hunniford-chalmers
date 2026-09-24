@@ -9,6 +9,7 @@ Pub birthday game as a static website. Read `README.md` first; it has the rules 
 - Runtime network calls: Commons photo loads, and the player-triggered Wikidata lookup for names not on the list (public API, `origin=*`, no key). Bulk data is build-time only (`scripts/build-data.mjs`).
 - The year always counts. Boundaries are exclusive. The list is the oracle; unknown names cost nothing.
 - Ladder is `WINDOWS`/`LABELS` at the top of `app.js`: three years down to ten days.
+- High scores are per-device (`localStorage`) behind `scoreStore` in `app.js`; a shared board replaces that object only.
 - The name is spelt "Hunniford Chalmers". The About page keeps the not-affiliated line.
 
 ## Working on it
@@ -17,6 +18,7 @@ Pub birthday game as a static website. Read `README.md` first; it has the rules 
 - `window.HC` exposes the game state for debugging in the console (`HC.run`, `HC.search("hunn")`, `HC.pairs(10)`).
 - After changing the data script, regenerate with `node scripts/build-data.mjs` (~15 min) and commit both `data/` files.
 - `node scripts/build-single.mjs` produces `dist/index.html` for single-file distribution. `dist/` is generated; don't edit it.
+- `og.png` is the link-preview image (1200×630), rendered from `scripts/og-template.html` by `node scripts/build-og.mjs` (needs Playwright; set `PLAYWRIGHT_PATH` if it isn't resolvable). Re-render it if the look changes; commit the PNG.
 
 ## Git
 
