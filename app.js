@@ -237,7 +237,7 @@
   function startRun({ daily }) {
     const key = todayKey();
     const seed = daily ? hash("HC:" + key) : (Math.random() * 2 ** 32) >>> 0;
-    run = { daily, key, level: 1, lives: LIVES, rng: mulberry32(seed), levels: [], lv: null, result: null };
+    run = { daily, key, level: 1, lives: LIVES, rng: mulberry32(seed), levels: [], lv: null, result: null, used: new Set() };
     nextLevel();
     show("level");
   }
@@ -269,6 +269,7 @@
     const lv = run.lv;
     if (p.id === lv.a.id || p.id === lv.b.id) return { kind: "anchor", why: "That's one of the anchors. Nice try. No penalty." };
     if (lv.guessed.has(p.id)) return { kind: "repeat", why: "Already tried this level. No penalty." };
+    if (run.used.has(p.id)) return { kind: "repeat", why: "Already used this run — one go per name. No penalty." };
     if (inWindow(p, lv)) return { kind: "good", why: `Born ${fmtDob(p)} — in the window.` };
     if (p.abs === lv.a.abs || p.abs === lv.b.abs) return { kind: "boundary", why: `Born ${fmtDob(p)} — same day as an anchor. Strictly between only.` };
     const early = lv.a.abs - p.abs, late = p.abs - lv.b.abs;
@@ -283,6 +284,7 @@
     closeSuggest(); el.guess.value = "";
     if (v.kind === "anchor" || v.kind === "repeat") { el.note.textContent = v.why; el.note.className = "note warn"; return; }
     lv.guessed.add(p.id);
+    run.used.add(p.id); // one go per name per run
     const good = v.kind === "good";
     const cls = good ? "good" : (v.kind === "boundary" ? "boundary" : "bad");
     lv.rows.push(good ? "🟩" : "🟥");
@@ -320,7 +322,7 @@
     el.overTitle.textContent = how === "won" ? "You have done a Hunniford Chalmers." : how === "lost" ? `Out at level ${lv.n}.` : `Gave up at level ${lv.n}.`;
     el.overSub.textContent = how === "won" ? "Ten levels, from ten years down to ten days. That is the whole game and you have finished it." : `The window was ${lv.label}: ${fmtDob(lv.a)} to ${fmtDob(lv.b)}.`;
     el.overAnchors.innerHTML = `<article class="card">${cardHtml(lv.a)}</article><div class="between" aria-hidden="true">→</div><article class="card">${cardHtml(lv.b)}</article>`;
-    const answers = validAnswers(lv).filter((p) => !lv.guessed.has(p.id)).sort((a, b) => b.w - a.w).slice(0, 3);
+    const answers = validAnswers(lv).filter((p) => !run.used.has(p.id)).sort((a, b) => b.w - a.w).slice(0, 3);
     el.overAnswers.innerHTML = answers.map((p) => `<li>${photoHtml(p, "thumb")}<div class="who">${esc(p.name)}<small>${fmtDob(p)}${p.desc ? " · " + esc(p.desc) : ""}</small></div></li>`).join("") || "<li>Nobody, apparently. That shouldn't happen.</li>";
     el.sharePreview.hidden = true; el.btnShare.textContent = "Share";
     el.hsEntry.hidden = true; el.hsPlaced.hidden = true; pendingEntry = null;
