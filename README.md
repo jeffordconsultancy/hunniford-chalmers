@@ -56,7 +56,7 @@ node scripts/build-data.mjs
 
 Node 18+, no dependencies. It queries the Wikidata SPARQL endpoint one birth-year at a time (about 12 seconds a year, ~15–20 minutes in all), checkpointing each year to `data/years/` so it can resume if the endpoint drops. It then runs `scripts/enrich-data.mjs`, which adds UK/Ireland and anglosphere citizenship flags (used only to weight which faces appear as anchors — everyone stays a valid answer). Output: `data/people.json` and `data/people.js`. Selection: humans with a day-precision date of birth, a Commons photo, an English Wikipedia article and at least 35 Wikidata sitelinks (a rough fame proxy — raise it for a shorter, more famous list). Names with commas or brackets are dropped.
 
-The site never calls Wikidata at runtime. Commit the generated files.
+The bulk list is built once and committed. At runtime the only Wikidata call is the player-triggered lookup for a name that isn't on the list.
 
 ## Photos
 
@@ -82,14 +82,13 @@ Names, birthdays and descriptions from [Wikidata](https://www.wikidata.org) (CC0
 
 ## Known limitations
 
-- **v0.1 shipped without the citizenship enrichment** (`scripts/enrich-data.mjs` exists but the endpoint throttled it). Anchor weighting instead uses the Wikidata description ("British actor", "American singer") at load time, which works well enough. Run the enrich script when the endpoint is quiet and the weighting picks it up automatically.
+- **The citizenship enrichment hasn't been run yet** (`scripts/enrich-data.mjs` exists; the endpoint throttled it). Anchor weighting instead uses the Wikidata description ("British actor", "American singer") at load time, which works well enough. Run the enrich script when the endpoint is quiet and the weighting picks it up automatically.
 - Hosted as a Claude artifact, photos show as initials tiles and the Wikidata lookup reports it can't reach Wikidata: that host blocks outside requests. On the real domain both work.
 - Judith Chalmers has no Commons photo, so she is an initials tile everywhere. Gloria Hunniford has one. Both are on the list via `data/extras.txt`.
-
 - The dataset is the oracle. Someone you're certain is famous may be missing (no Commons photo, no day-precision birthday on Wikidata, or under the sitelinks threshold).
 - The list is international, not UK-only. A UK filter is the first follow-up.
 - Commons hotlinking is normally fine but can be blocked on some networks; the initials fallback covers it.
 
-## Follow-ups (not in v0.1)
+## Follow-ups
 
 UK-only filter, leaderboards, difficulty by era, sound, folding player lookups back into the shipped list.
