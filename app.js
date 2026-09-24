@@ -4,8 +4,8 @@
 
   // ---------- Config ----------
   // Days between the two anchors' birthdays, levels 1..10. The year always counts.
-  const WINDOWS = [1095, 365, 182, 91, 61, 42, 30, 21, 14, 10];
-  const LABELS = ["three years", "a year", "six months", "three months", "two months", "six weeks", "a month", "three weeks", "a fortnight", "ten days"];
+  const WINDOWS = [3650, 1826, 1095, 548, 365, 182, 91, 42, 21, 10];
+  const LABELS = ["ten years", "five years", "three years", "eighteen months", "a year", "six months", "three months", "six weeks", "three weeks", "ten days"];
   const LIVES = 3;
   const MIN_BETWEEN = 3; // an anchor pair needs at least this many valid answers on the list
   const LAUNCH = "2026-09-24"; // Daily #1
@@ -155,10 +155,12 @@
   }
   function makeLevel(n, rng) {
     const w = WINDOWS[n - 1], hiGap = gapMax(w);
+    const used = new Set((run?.levels || []).flatMap((l) => [l.a.id, l.b.id])); // no repeat faces within a run
     let best = null;
     for (let tries = 0; tries < 400; tries++) {
       const a = pickPerson(rng);
-      const cands = peopleBetweenAbs(a.abs + w, a.abs + hiGap);
+      if (used.has(a.id)) continue;
+      const cands = peopleBetweenAbs(a.abs + w, a.abs + hiGap).filter((p) => !used.has(p.id));
       if (!cands.length) continue;
       const b = weightedPick(cands, rng);
       if (countAbsBetween(a.abs, b.abs) < MIN_BETWEEN) continue;
@@ -315,7 +317,7 @@
     if (run.daily) store.set("hc-daily-" + run.key, { level: reached, how });
 
     el.overTitle.textContent = how === "won" ? "You have done a Hunniford Chalmers." : how === "lost" ? `Out at level ${lv.n}.` : `Gave up at level ${lv.n}.`;
-    el.overSub.textContent = how === "won" ? "Ten levels, from three years down to ten days. That is the whole game and you have finished it." : `The window was ${lv.label}: ${fmtDob(lv.a)} to ${fmtDob(lv.b)}.`;
+    el.overSub.textContent = how === "won" ? "Ten levels, from ten years down to ten days. That is the whole game and you have finished it." : `The window was ${lv.label}: ${fmtDob(lv.a)} to ${fmtDob(lv.b)}.`;
     el.overAnchors.innerHTML = `<article class="card">${cardHtml(lv.a)}</article><div class="between" aria-hidden="true">→</div><article class="card">${cardHtml(lv.b)}</article>`;
     const answers = validAnswers(lv).filter((p) => !lv.guessed.has(p.id)).sort((a, b) => b.w - a.w).slice(0, 3);
     el.overAnswers.innerHTML = answers.map((p) => `<li>${photoHtml(p, "thumb")}<div class="who">${esc(p.name)}<small>${fmtDob(p)}${p.desc ? " · " + esc(p.desc) : ""}</small></div></li>`).join("") || "<li>Nobody, apparently. That shouldn't happen.</li>";
