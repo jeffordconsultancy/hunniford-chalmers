@@ -35,7 +35,7 @@ Arcade rules. Clear at least three levels (or any level while the table has room
 - **The year counts.** Always.
 - **Boundaries are exclusive.** Born on the same day as either anchor doesn't count.
 - Guessing one of the anchors, or a name already tried this level, costs nothing.
-- A name that isn't on the list costs nothing. You're offered a **Wikidata lookup**: the browser asks Wikidata's public API (no key, no cost to the site — it's rate-limited per player) for that person's birthday and photo, checks them against the window, and remembers them on that device. Nobody with that name and a known birthday → still no penalty.
+- A name that isn't on the list costs nothing. When the local list has no match for what's typed, the browser **asks Wikidata automatically** (public API, no key, no cost to the site — it's rate-limited per player) for that person's birthday and photo, shows the matches in the same dropdown, checks the pick against the window, and remembers them on that device. Nobody with that name and a known birthday → still no penalty.
 - A wrong birthday costs a life. Every wrong guess shows the real birthday — that's how you get better.
 
 ## Files

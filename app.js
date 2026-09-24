@@ -315,7 +315,17 @@
     [...el.suggest.children].forEach((li, j) => li.classList.toggle("active", j === sugIndex));
     el.suggest.children[sugIndex]?.scrollIntoView({ block: "nearest" });
   }
-  el.guess.addEventListener("input", () => { el.note.textContent = ""; el.note.className = "note"; lookupPending = null; renderSuggest(search(el.guess.value)); });
+  // Local matches show instantly. If there are none and the text looks like a name, Wikidata is asked
+  // automatically after a short pause, so the player never has to know the list has an edge.
+  let lookupTimer = null, lookupSeq = 0;
+  el.guess.addEventListener("input", () => {
+    el.note.textContent = ""; el.note.className = "note";
+    clearTimeout(lookupTimer);
+    const q = el.guess.value.trim();
+    const local = search(q);
+    renderSuggest(local);
+    if (!local.length && looksLikeName(q)) lookupTimer = setTimeout(() => lookup(q), 450);
+  });
   el.guess.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown" && sugItems.length) { e.preventDefault(); setActive(sugIndex + 1); }
     else if (e.key === "ArrowUp" && sugItems.length) { e.preventDefault(); setActive(sugIndex - 1); }
@@ -326,7 +336,7 @@
       else if (el.guess.value.trim()) {
         const exact = PEOPLE.find((p) => p.key === fold(el.guess.value));
         if (exact) submit(exact);
-        else offerLookup(el.guess.value.trim());
+        else { clearTimeout(lookupTimer); lookup(el.guess.value.trim()); }
       }
     }
   });
@@ -335,12 +345,8 @@
 
   // ---------- Wikidata lookup (free, no key; rate-limited per player, not per site) ----------
   const WD_API = "https://www.wikidata.org/w/api.php";
-  let lookupPending = null;
-  function offerLookup(q) {
-    lookupPending = q;
-    el.note.className = "note warn";
-    el.note.innerHTML = `Not on our list — no penalty. <button type="button" class="link small" id="btn-lookup">Look up “${esc(q)}” on Wikidata</button>`;
-  }
+  const LOOKUP_CACHE = new Map(); // folded query -> people found (or [] for nobody)
+  const looksLikeName = (q) => q.length >= 4 && /^[\p{L}\p{M}.'’\- ]+$/u.test(q) && (q.includes(" ") || q.length >= 6);
   async function wd(params) {
     const url = WD_API + "?" + new URLSearchParams({ ...params, format: "json", origin: "*" });
     const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
@@ -348,12 +354,16 @@
     return res.json();
   }
   async function lookup(q) {
+    if (!q) return;
+    const key = fold(q), seq = ++lookupSeq;
+    if (LOOKUP_CACHE.has(key)) return showLookup(q, LOOKUP_CACHE.get(key));
     el.note.className = "note";
-    el.note.textContent = "Asking Wikidata…";
+    el.note.textContent = "Not on our list — checking Wikidata…";
     try {
       const s = await wd({ action: "wbsearchentities", search: q, language: "en", uselang: "en", type: "item", limit: 7 });
       const ids = (s.search || []).map((r) => r.id);
-      if (!ids.length) return noLookup(q);
+      if (seq !== lookupSeq) return; // player kept typing
+      if (!ids.length) { LOOKUP_CACHE.set(key, []); return showLookup(q, []); }
       const g = await wd({ action: "wbgetentities", ids: ids.join("|"), props: "labels|descriptions|claims|sitelinks", languages: "en" });
       const found = [];
       for (const id of ids) {
@@ -370,23 +380,30 @@
         };
         found.push(KNOWN.has(id) ? PEOPLE.find((p) => p.id === id) : prep({ ...raw, lookedUp: 1 }));
       }
-      if (!found.length) return noLookup(q);
+      if (seq !== lookupSeq) return;
       for (const p of found) if (!KNOWN.has(p.id)) { PEOPLE.push(p); KNOWN.add(p.id); }
       const keep = PEOPLE.filter((p) => p.lookedUp).slice(-500).map(({ id, name, dob, img, desc, sitelinks }) => ({ id, name, dob, img, desc, sitelinks }));
       store.set("hc-lookups", keep);
-      el.note.textContent = found.length === 1 ? "Found one on Wikidata. Is this them?" : "Found these on Wikidata. Pick the right one.";
-      renderSuggest(found, true);
-      el.guess.focus({ preventScroll: true });
+      LOOKUP_CACHE.set(key, found);
+      showLookup(q, found);
     } catch (e) {
+      if (seq !== lookupSeq) return;
       el.note.className = "note warn";
       el.note.textContent = "Couldn't reach Wikidata just now. No penalty — try another name.";
     }
   }
-  function noLookup(q) {
-    el.note.className = "note warn";
-    el.note.textContent = `Wikidata has nobody called “${q}” with a known birthday. No penalty.`;
+  function showLookup(q, found) {
+    if (fold(el.guess.value.trim()) !== fold(q)) return; // stale
+    if (!found.length) {
+      closeSuggest();
+      el.note.className = "note warn";
+      el.note.textContent = `Not on our list, and Wikidata has nobody called “${q}” with a known birthday. No penalty.`;
+      return;
+    }
+    el.note.className = "note";
+    el.note.textContent = found.length === 1 ? "From Wikidata — press Enter if that's them." : "From Wikidata — pick the right one.";
+    renderSuggest(found, true);
   }
-  document.addEventListener("click", (e) => { if (e.target.id === "btn-lookup" && lookupPending) { e.preventDefault(); lookup(lookupPending); } });
 
   // ---------- Buttons ----------
   document.addEventListener("click", (e) => {
