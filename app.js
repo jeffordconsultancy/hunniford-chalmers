@@ -66,7 +66,9 @@
   // ---------- State ----------
   const $ = (s) => document.querySelector(s);
   const el = {
-    home: $("#screen-home"), level: $("#screen-level"), over: $("#screen-over"), about: $("#screen-about"),
+    home: $("#screen-home"), level: $("#screen-level"), over: $("#screen-over"), about: $("#screen-about"), scores: $("#screen-scores"),
+    hsEntry: $("#hs-entry"), hsForm: $("#hs-form"), hsInitials: $("#hs-initials"), hsPlaced: $("#hs-placed"),
+    scoresTable: $("#scores-table"), scoresEmpty: $("#scores-empty"),
     flash: $("#flash"), flashInner: $("#flash-inner"),
     btnDaily: $("#btn-daily"), dataCount: $("#data-count"),
     ladder: $("#ladder"), levelName: $("#level-name"), lives: $("#lives"),
@@ -90,9 +92,10 @@
 
   // ---------- Screens ----------
   function show(name) {
-    for (const k of ["home", "level", "over", "about"]) el[k].hidden = k !== name;
+    for (const k of ["home", "level", "over", "about", "scores"]) el[k].hidden = k !== name;
     window.scrollTo(0, 0);
     if (name === "home") refreshHome();
+    if (name === "scores") renderScores();
   }
   function refreshHome() {
     el.dataCount.textContent = `${PEOPLE.length.toLocaleString("en-GB")} people on the list. Daily #${dailyNumber(todayKey())}.`;
@@ -135,6 +138,57 @@
     const [x, y] = weightedPick(pairs(w), rng, ([x, y]) => Math.sqrt(dayWeight(x) * dayWeight(y))); // both anchors should be known faces
     return { n, w, label: LABELS[n - 1], a: weightedPick(BY_ABS.get(x), rng), b: weightedPick(BY_ABS.get(y), rng), guessed: new Set(), rows: [] };
   }
+
+  // ---------- High scores (arcade style) ----------
+  // Storage is one small object so a shared backend can replace localStorage later without touching the UI.
+  const SCORES_MAX = 10;
+  const SCORE_MIN_LEVEL = 3; // cleared this many levels and you may enter your initials (or any score while the table has room)
+  const scoreStore = {
+    load() { return (store.get("hc-scores") || []).filter((s) => s && s.name && Number.isInteger(s.level)); },
+    save(rows) { store.set("hc-scores", rows); },
+  };
+  const rankScore = (s) => s.level * 1000 + s.lives * 100 - Math.min(s.wrong, 99);
+  function sortScores(rows) { return rows.sort((x, y) => rankScore(y) - rankScore(x) || x.ts - y.ts); }
+  function qualifies(entry) {
+    const rows = sortScores(scoreStore.load());
+    if (entry.level < 1) return false;
+    if (rows.length < SCORES_MAX && entry.level >= 1) return true;
+    return entry.level >= SCORE_MIN_LEVEL && rankScore(entry) > rankScore(rows[rows.length - 1]);
+  }
+  function addScore(entry) {
+    const rows = sortScores([...scoreStore.load(), entry]).slice(0, SCORES_MAX);
+    scoreStore.save(rows);
+    return rows.findIndex((r) => r.ts === entry.ts && r.name === entry.name);
+  }
+  const fmtWhen = (ts) => new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  function scoresTableHtml(rows, youTs) {
+    return rows.map((r, i) => `<tr class="${r.ts === youTs ? "you" : ""}${i === 0 ? " first" : ""}"><td>${i + 1}</td><td class="name">${esc(r.name)}</td><td>${r.level}${r.won ? " 🏆" : ""}</td><td>${"🍺".repeat(r.lives) || "–"}</td><td class="when">${fmtWhen(r.ts)}</td></tr>`).join("");
+  }
+  function renderScores(youTs) {
+    const rows = sortScores(scoreStore.load());
+    el.scoresTable.querySelector("tbody").innerHTML = scoresTableHtml(rows, youTs);
+    el.scoresEmpty.hidden = rows.length > 0;
+  }
+  let pendingEntry = null;
+  function offerHighScore(entry) {
+    pendingEntry = entry;
+    el.hsPlaced.hidden = true;
+    el.hsEntry.hidden = false;
+    el.hsInitials.value = "";
+    setTimeout(() => el.hsInitials.focus({ preventScroll: true }), 80);
+  }
+  el.hsInitials.addEventListener("input", () => { el.hsInitials.value = el.hsInitials.value.toUpperCase().replace(/[^A-Z0-9!?]/g, "").slice(0, 3); });
+  el.hsForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!pendingEntry) return;
+    const name = (el.hsInitials.value || "???").padEnd(3, "?").slice(0, 3);
+    const entry = { ...pendingEntry, name };
+    const pos = addScore(entry);
+    pendingEntry = null;
+    el.hsEntry.hidden = true;
+    el.hsPlaced.innerHTML = `<div class="arcade-head">${pos === 0 ? "New top score" : "Rank " + (pos + 1)}</div><table class="scores"><tbody>${scoresTableHtml(sortScores(scoreStore.load()), entry.ts)}</tbody></table>`;
+    el.hsPlaced.hidden = false;
+  });
 
   // ---------- Run ----------
   function startRun({ daily }) {
@@ -226,6 +280,11 @@
     const answers = validAnswers(lv).filter((p) => !lv.guessed.has(p.id)).sort((a, b) => b.sitelinks - a.sitelinks).slice(0, 3);
     el.overAnswers.innerHTML = answers.map((p) => `<li>${photoHtml(p, "thumb")}<div class="who">${esc(p.name)}<small>${fmtDob(p)}${p.desc ? " · " + esc(p.desc) : ""}</small></div></li>`).join("") || "<li>Nobody, apparently. That shouldn't happen.</li>";
     el.sharePreview.hidden = true; el.btnShare.textContent = "Share";
+    el.hsEntry.hidden = true; el.hsPlaced.hidden = true; pendingEntry = null;
+    const cleared = how === "won" ? 10 : lv.n - 1;
+    const wrong = run.levels.reduce((n, l) => n + l.rows.filter((r) => r === "🟥").length, 0);
+    const entry = { level: cleared, lives: Math.max(run.lives, 0), wrong, won: how === "won", daily: run.daily, ts: Date.now() };
+    if (qualifies(entry)) offerHighScore(entry);
     show("over");
   }
 
@@ -357,5 +416,5 @@
     el.dataCount.textContent = "No data loaded. Run `node scripts/build-data.mjs` first.";
   }
   show("home");
-  window.HC = { PEOPLE, pairs, WINDOWS, startRun, submit, judge, get run() { return run; }, search };
+  window.HC = { PEOPLE, pairs, WINDOWS, scoreStore, startRun, submit, judge, get run() { return run; }, search };
 })();

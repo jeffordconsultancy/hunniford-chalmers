@@ -26,6 +26,10 @@ No backend, no API keys, no accounts, no build step. Open `index.html` or host t
 
 Anchor B is born exactly that many days after anchor A. Pairs are only used when at least three people on the list are born strictly between them, and both anchors are weighted towards well-known faces. Change `WINDOWS` and `LABELS` at the top of `app.js` to retune it.
 
+### High scores
+
+Arcade rules. Clear at least three levels (or any level while the table has room) and lose, and you're asked for three initials. Top ten, ranked by levels cleared, then lives left, then fewest wrong guesses. The table lives in the browser that played the run — like a cabinet in a pub, it's that machine's board. `scoreStore` in `app.js` is the one place that reads and writes it, so a shared board can be dropped in later without touching the UI.
+
 ### The rules, precisely
 
 - **The year counts.** Always.
@@ -46,6 +50,8 @@ scripts/build-data.mjs  regenerates the list from Wikidata (phase 1)
 scripts/enrich-data.mjs adds citizenship flags for anchor weighting (phase 2, called by build-data)
 scripts/extras.mjs      adds must-have people from data/extras.txt regardless of the fame threshold (phase 3)
 scripts/build-single.mjs  inlines everything into dist/index.html (one file)
+scripts/build-og.mjs    renders og.png, the 1200×630 link-preview image, from scripts/og-template.html
+og.png                  link-preview image referenced by the Open Graph tags in index.html
 ```
 
 ## Regenerating the list
@@ -91,4 +97,4 @@ Names, birthdays and descriptions from [Wikidata](https://www.wikidata.org) (CC0
 
 ## Follow-ups
 
-UK-only filter, leaderboards, difficulty by era, sound, folding player lookups back into the shipped list.
+UK-only filter, a shared (cross-device) high-score board, difficulty by era, sound, folding player lookups back into the shipped list.
