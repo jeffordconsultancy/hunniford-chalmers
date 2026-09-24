@@ -18,11 +18,24 @@
 
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+  // Pub fame, not world fame. Anchors should be the people a British pub table can picture:
+  // presenters, soap actors, comedians, pop singers, newsreaders. Not laureates, ministers or novelists.
   const UK_RE = /\b(British|English|Scottish|Welsh|Irish|Northern Irish|UK|United Kingdom)\b/i;
   const EN_RE = /\b(American|Australian|Canadian|New Zealand|U\.S\.|United States)\b/i;
+  const TELLY_RE = /\b(television|TV|presenter|broadcaster|newsreader|weather|game show|quiz|soap|host|personality|panellist|impressionist|ventriloquist|reality|children's television|Blue Peter|radio|DJ|disc jockey|chef|magician)\b/i; // the telly proper
+  const TV_RE = /\b(actor|actress|comedian|comic|comedienne|entertainer|singer|pop|musician|rapper|dancer|model)\b/i;                 // entertainment, one step out
+  const HIGHBROW_RE = /\b(politician|philosoph\w*|economist|academic|professor|scientist|physicist|chemist|biologist|mathematician|historian|theolog\w*|novelist|poet|playwright|essayist|journalist|editor|author|writer|activist|diplomat|judge|barrister|lawyer|solicitor|bishop|archbishop|cardinal|priest|clergy\w*|rabbi|businessman|businesswoman|business\w*|executive|banker|financier|engineer|architect|composer|conductor|painter|sculptor|photographer|critic|scholar|linguist|sociologist|psychologist|anthropologist|civil servant|peer|baron\w*|lord|MP|Member of Parliament|prime minister|president|minister|general|admiral|military|officer|Nobel|laureate|chess|cyclist|rower|athlete|swimmer|golfer|cricketer|jockey|racing driver|footballer|football player|manager)\b/i;
   function anchorWeight(p) {
-    const uk = p.uk || UK_RE.test(p.desc || ""), en = p.en || EN_RE.test(p.desc || "");
-    return Math.pow(p.sitelinks, 3) * (uk ? 10 : en ? 3 : 1);
+    const d = p.desc || "";
+    const uk = p.uk || UK_RE.test(d), en = p.en || EN_RE.test(d);
+    // "Minor" is the point: fame helps up to about 60 Wikipedia languages, then counts against you.
+    const sl = Math.max(p.sitelinks, 1);
+    let w = sl <= 60 ? 1 + Math.log2(sl) : (1 + Math.log2(60)) * Math.sqrt(60 / sl);
+    const NEVER_RE = /\b(politician|MP|Member of Parliament|minister|president|peer|baron\w*|lord|bishop|archbishop|judge|general|admiral)\b/i; // overrides everything
+    w *= NEVER_RE.test(d) ? 0.01 : TELLY_RE.test(d) ? 90 : TV_RE.test(d) ? 25 : HIGHBROW_RE.test(d) ? 0.03 : 1;
+    w *= uk ? 6 : en ? 0.6 : 0.1; // British pub, British faces
+    if (!p.img) w *= 0.3; // a face beats an initials tile, but a known name beats an unknown face
+    return w;
   }
 
   function prep(p) {
@@ -125,18 +138,45 @@
     for (let i = lowerBound(lv.a.abs + 1); i < ABS_DAYS.length && ABS_DAYS[i] < lv.b.abs; i++) out.push(...BY_ABS.get(ABS_DAYS[i]));
     return out;
   }
+  // The gap between anchors is at least w days and at most w + ~15% (min 2), so the game can prefer
+  // recognisable faces instead of whoever happens to be born exactly w days apart.
+  const gapMax = (w) => w + Math.max(2, Math.round(w * 0.15));
+  const CUMW = []; { let c = 0; for (const p of PEOPLE) { c += p.w; CUMW.push(c); } }
+  function pickPerson(rng) {
+    const r = rng() * CUMW[CUMW.length - 1];
+    let lo = 0, hi = CUMW.length - 1;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (CUMW[mid] < r) lo = mid + 1; else hi = mid; }
+    return PEOPLE[lo];
+  }
+  function peopleBetweenAbs(lo, hi) { // inclusive range of absolute days
+    const out = [];
+    for (let i = lowerBound(lo); i < ABS_DAYS.length && ABS_DAYS[i] <= hi; i++) out.push(...BY_ABS.get(ABS_DAYS[i]));
+    return out;
+  }
+  function makeLevel(n, rng) {
+    const w = WINDOWS[n - 1], hiGap = gapMax(w);
+    let best = null;
+    for (let tries = 0; tries < 400; tries++) {
+      const a = pickPerson(rng);
+      const cands = peopleBetweenAbs(a.abs + w, a.abs + hiGap);
+      if (!cands.length) continue;
+      const b = weightedPick(cands, rng);
+      if (countAbsBetween(a.abs, b.abs) < MIN_BETWEEN) continue;
+      const score = Math.sqrt(a.w * b.w);
+      if (!best || score > best.score) best = { a, b, score };
+      if (best.score > 50 && tries > 30) break; // good enough, stop looking
+    }
+    if (!best) { // fall back to any pair with answers
+      for (const x of ABS_DAYS) if (BY_ABS.has(x + w) && countAbsBetween(x, x + w) >= 1) { best = { a: BY_ABS.get(x)[0], b: BY_ABS.get(x + w)[0] }; break; }
+    }
+    return { n, w, label: LABELS[n - 1], a: best.a, b: best.b, guessed: new Set(), rows: [] };
+  }
+  // Kept for the console/debug surface: how many exact-gap pairs exist for a window.
   function pairs(w) {
     if (PAIRS[w]) return PAIRS[w];
     const out = [];
     for (const x of ABS_DAYS) if (BY_ABS.has(x + w) && countAbsBetween(x, x + w) >= MIN_BETWEEN) out.push([x, x + w]);
-    if (!out.length) for (const x of ABS_DAYS) if (BY_ABS.has(x + w) && countAbsBetween(x, x + w) >= 1) out.push([x, x + w]);
     return (PAIRS[w] = out);
-  }
-  const dayWeight = (abs) => Math.max(...BY_ABS.get(abs).map((p) => p.w));
-  function makeLevel(n, rng) {
-    const w = WINDOWS[n - 1];
-    const [x, y] = weightedPick(pairs(w), rng, ([x, y]) => Math.sqrt(dayWeight(x) * dayWeight(y))); // both anchors should be known faces
-    return { n, w, label: LABELS[n - 1], a: weightedPick(BY_ABS.get(x), rng), b: weightedPick(BY_ABS.get(y), rng), guessed: new Set(), rows: [] };
   }
 
   // ---------- High scores (arcade style) ----------
@@ -213,7 +253,7 @@
     renderLives();
     el.cardA.innerHTML = cardHtml(lv.a);
     el.cardB.innerHTML = cardHtml(lv.b);
-    el.prompt.innerHTML = `Name someone born in the <strong>${lv.label}</strong> between ${fmtDob(lv.a)} and ${fmtDob(lv.b)}. <span class="fine">${lv.w - 1} days, not counting either birthday.</span>`;
+    el.prompt.innerHTML = `Name someone born in the <strong>${lv.label}</strong> between ${fmtDob(lv.a)} and ${fmtDob(lv.b)}. <span class="fine">${lv.b.abs - lv.a.abs - 1} days, not counting either birthday.</span>`;
     el.note.textContent = ""; el.note.className = "note";
     el.guess.value = ""; closeSuggest();
     setTimeout(() => el.guess.focus({ preventScroll: true }), 50);
@@ -277,7 +317,7 @@
     el.overTitle.textContent = how === "won" ? "You have done a Hunniford Chalmers." : how === "lost" ? `Out at level ${lv.n}.` : `Gave up at level ${lv.n}.`;
     el.overSub.textContent = how === "won" ? "Ten levels, from three years down to ten days. That is the whole game and you have finished it." : `The window was ${lv.label}: ${fmtDob(lv.a)} to ${fmtDob(lv.b)}.`;
     el.overAnchors.innerHTML = `<article class="card">${cardHtml(lv.a)}</article><div class="between" aria-hidden="true">→</div><article class="card">${cardHtml(lv.b)}</article>`;
-    const answers = validAnswers(lv).filter((p) => !lv.guessed.has(p.id)).sort((a, b) => b.sitelinks - a.sitelinks).slice(0, 3);
+    const answers = validAnswers(lv).filter((p) => !lv.guessed.has(p.id)).sort((a, b) => b.w - a.w).slice(0, 3);
     el.overAnswers.innerHTML = answers.map((p) => `<li>${photoHtml(p, "thumb")}<div class="who">${esc(p.name)}<small>${fmtDob(p)}${p.desc ? " · " + esc(p.desc) : ""}</small></div></li>`).join("") || "<li>Nobody, apparently. That shouldn't happen.</li>";
     el.sharePreview.hidden = true; el.btnShare.textContent = "Share";
     el.hsEntry.hidden = true; el.hsPlaced.hidden = true; pendingEntry = null;
@@ -300,7 +340,7 @@
       else if (p.key.includes(k)) subs.push(p);
       if (starts.length > 40) break;
     }
-    const bySl = (a, b) => b.sitelinks - a.sitelinks;
+    const bySl = (a, b) => b.w - a.w;
     return [...starts.sort(bySl), ...words.sort(bySl), ...subs.sort(bySl)].slice(0, 8);
   }
   function renderSuggest(items, fromWikidata = false) {

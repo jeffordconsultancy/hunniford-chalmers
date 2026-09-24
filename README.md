@@ -24,7 +24,7 @@ No backend, no API keys, no accounts, no build step. Open `index.html` or host t
 | 9 | a fortnight (14) |
 | 10 | ten days (10) |
 
-Anchor B is born exactly that many days after anchor A. Pairs are only used when at least three people on the list are born strictly between them, and both anchors are weighted towards well-known faces. Change `WINDOWS` and `LABELS` at the top of `app.js` to retune it.
+Anchor B is born between that many days and about 15% more after anchor A (ten days → 10–12; three years → up to about 3y 2m), and a pair is only used when at least three people on the list are born strictly between them. Anchors are chosen by **pub fame, not world fame**: British, on the telly (presenters, personalities, soap and sitcom actors, comedians, pop singers), and not too famous — fame counts against you above ~60 Wikipedia languages, and politicians, academics, novelists and the like are effectively excluded. See `anchorWeight` in `app.js`; `WINDOWS`/`LABELS` set the ladder.
 
 ### High scores
 
