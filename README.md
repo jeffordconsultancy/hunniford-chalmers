@@ -42,7 +42,8 @@ Arcade rules. Clear at least three levels (or any level while the table has room
 
 ```
 index.html              markup
-styles.css              look
+styles.css              look — editorial skin: off-white/ink, hairlines, cobalt accent, light and dark
+fonts/                  self-hosted Instrument Serif + Archivo (OFL), so the site makes no third-party font calls
 app.js                  the game (vanilla JS, no dependencies)
 data/people.json        the list (generated)
 data/people.js          same list as window.PEOPLE, so the page works from file://
@@ -84,7 +85,7 @@ Rollback: revert the commit on `main` (`git revert`), or re-run the previous Pag
 
 ## Attribution
 
-Names, birthdays and descriptions from [Wikidata](https://www.wikidata.org) (CC0). Photos from [Wikimedia Commons](https://commons.wikimedia.org); licences vary per file and each card links to the file's page. Not affiliated with, endorsed by or connected to either presenter.
+Type: [Instrument Serif](https://github.com/Instrument/instrument-serif) and [Archivo](https://github.com/Omnibus-Type/Archivo), both under the SIL Open Font License, self-hosted in `fonts/` with their licences. Names, birthdays and descriptions from [Wikidata](https://www.wikidata.org) (CC0). Photos from [Wikimedia Commons](https://commons.wikimedia.org); licences vary per file and each card links to the file's page. Not affiliated with, endorsed by or connected to either presenter.
 
 ## Known limitations
 

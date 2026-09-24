@@ -1,37 +1,39 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
 <style>
+  @font-face { font-family: "Instrument Serif"; src: url("../fonts/InstrumentSerif-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Instrument Serif"; src: url("../fonts/InstrumentSerif-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+  @font-face { font-family: "Archivo"; src: url("../fonts/Archivo-Variable.woff2") format("woff2"); font-weight: 100 900; }
   html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
-  body {
-    background: #0f2a1f;
-    background-image: radial-gradient(ellipse at 30% 20%, #1a4030 0%, #0f2a1f 65%);
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #f3e9d2; position: relative;
-  }
-  .title { position: absolute; left: 80px; top: 92px; font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 112px; line-height: .92; letter-spacing: -1px; }
-  .title span { color: #e8a33d; }
-  .sub { position: absolute; left: 82px; top: 352px; font-size: 34px; line-height: 1.3; color: #c9bda3; max-width: 640px; }
-  .sub em { font-style: normal; color: #e8a33d; font-weight: 600; }
-  .cards { position: absolute; right: 80px; top: 120px; display: flex; gap: 22px; align-items: center; }
-  .card { width: 178px; background: #143627; border: 2px solid rgba(243,233,210,.16); border-radius: 18px; padding: 14px; text-align: center; }
-  .tile { width: 150px; height: 150px; border-radius: 12px; margin: 0 auto 12px; display: grid; place-items: center; font-family: Georgia, serif; font-size: 58px; font-weight: 700; color: #e8a33d; background: linear-gradient(135deg, #2a1a0e, #3d2816); }
-  .name { font-weight: 700; font-size: 20px; }
-  .dob { color: #e8a33d; font-weight: 600; font-size: 17px; margin-top: 4px; }
-  .arrow { color: #e8a33d; font-size: 44px; }
-  .q { position: absolute; right: 80px; top: 392px; width: 400px; text-align: center; font-family: Georgia, serif; font-size: 36px; color: #f3e9d2; line-height: 1.15; }
-  .q small { display: block; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; color: #c9bda3; margin-top: 10px; }
-  .foot { position: absolute; left: 82px; bottom: 56px; font-size: 26px; color: #e8a33d; font-weight: 600; letter-spacing: .5px; }
-  .pints { position: absolute; right: 84px; bottom: 50px; font-size: 40px; letter-spacing: 6px; }
-</style></head>
+  body { background: #f5f5f3; color: #101010; font-family: "Archivo", Helvetica, Arial, sans-serif; position: relative; }
+  .rule { position: absolute; left: 72px; right: 72px; top: 92px; height: 1px; background: #101010; }
+  .eyebrow { position: absolute; left: 72px; top: 58px; font-size: 15px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #6f6f6a; }
+  .site { position: absolute; right: 72px; top: 58px; font-size: 15px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .title { position: absolute; left: 66px; top: 118px; font-family: "Instrument Serif", Georgia, serif; font-size: 168px; line-height: .86; letter-spacing: -0.03em; }
+  .title em { font-style: italic; color: #2337ff; }
+  .sub { position: absolute; left: 72px; top: 456px; font-size: 30px; line-height: 1.3; color: #3a3a38; max-width: 620px; }
+  .sub em { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-size: 1.15em; color: #101010; }
+  .cards { position: absolute; right: 72px; top: 132px; display: flex; gap: 26px; align-items: flex-start; }
+  .card { width: 190px; }
+  .tile { width: 190px; height: 190px; background: #e9e9e5; border: 1px solid #d6d6d1; display: grid; place-items: center; font-family: "Instrument Serif", Georgia, serif; font-size: 72px; }
+  .name { font-weight: 600; font-size: 19px; margin-top: 12px; letter-spacing: -0.005em; }
+  .dob { font-family: "Instrument Serif", Georgia, serif; font-size: 23px; margin-top: 2px; }
+  .between { align-self: center; font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-size: 22px; color: #6f6f6a; writing-mode: vertical-rl; transform: rotate(180deg); margin-top: 60px; }
+  .ladder { position: absolute; right: 72px; bottom: 60px; display: flex; gap: 5px; }
+  .ladder span { width: 38px; height: 30px; border: 1px solid #d6d6d1; background: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 600; color: #6f6f6a; }
+  .ladder span.done { background: #101010; color: #f5f5f3; border-color: #101010; }
+  .ladder span.now { background: #2337ff; color: #fff; border-color: #2337ff; }
+</style>
 <body>
-  <div class="title">Hunniford<br><span>Chalmers</span></div>
+  <div class="eyebrow">The pub birthday game</div>
+  <div class="site">hunnifordchalmers.com</div>
+  <div class="rule"></div>
+  <div class="title">Hunniford<br><em>Chalmers</em></div>
   <div class="sub">Two famous people, two birthdays.<br>Name someone born <em>between</em> them.</div>
   <div class="cards">
     <div class="card"><div class="tile">GH</div><div class="name">Gloria Hunniford</div><div class="dob">10 April 1940</div></div>
-    <div class="arrow">→</div>
+    <div class="between">between</div>
     <div class="card"><div class="tile">JC</div><div class="name">Judith Chalmers</div><div class="dob">10 October 1935</div></div>
   </div>
-  <div class="q">Ten levels. Three years<br>down to ten days.<small>The pub game, online</small></div>
-  <div class="foot">hunnifordchalmers.com</div>
-  <div class="pints">🍺🍺🍺</div>
+  <div class="ladder"><span class="done">1</span><span class="done">2</span><span class="done">3</span><span class="now">4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
 </body></html>

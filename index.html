@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hunniford Chalmers</title>
 <meta name="description" content="The pub birthday game. Two famous people, two birthdays. Name someone born between them. Ten levels, from three years apart down to ten days.">
-<meta name="theme-color" content="#0f2a1f">
+<meta name="theme-color" content="#f5f5f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://hunnifordchalmers.com/">
 <!-- Link previews (WhatsApp, iMessage, LinkedIn, Slack, X) -->
 <meta property="og:type" content="website">
@@ -21,28 +22,38 @@
 <meta name="twitter:title" content="Hunniford Chalmers">
 <meta name="twitter:description" content="The pub birthday game. Name someone born between two famous people's birthdays. Ten levels, three years down to ten days.">
 <meta name="twitter:image" content="https://hunnifordchalmers.com/og.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f2a1f'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23e8a33d' font-family='Georgia,serif' font-weight='bold'%3EHC%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23101010'/%3E%3Ctext x='32' y='46' font-size='38' text-anchor='middle' fill='%23f5f5f3' font-family='Georgia,serif' font-style='italic'%3EHC%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<header class="top">
-  <a href="#" class="brand" data-go="home">Hunniford <span>Chalmers</span></a>
-  <button class="link small" data-go="about">About</button>
+<header class="masthead">
+  <a href="#" class="brand" data-go="home">Hunniford Chalmers</a>
+  <nav class="nav">
+    <button class="navlink" data-go="scores">High scores</button>
+    <button class="navlink" data-go="about">About</button>
+  </nav>
 </header>
 
 <main id="app">
 
   <!-- HOME -->
   <section id="screen-home" class="screen">
-    <h1 class="title">Hunniford<br>Chalmers</h1>
-    <p class="lede">Two famous people, two birthdays. Name someone born <em>between</em> them. Ten levels, from three years apart down to ten days.</p>
+    <p class="eyebrow">The pub birthday game</p>
+    <h1 class="title">Hunniford<br><em>Chalmers</em></h1>
+    <p class="lede">Two famous people, two birthdays. Name someone born <em>between</em> them.</p>
 
     <div class="home-actions">
       <button class="btn primary big" data-action="play">Play</button>
       <button class="btn big" data-action="daily" id="btn-daily">Daily</button>
     </div>
-    <button class="link small" data-go="scores">High scores</button>
+
+    <dl class="facts">
+      <div><dt>Levels</dt><dd>10</dd></div>
+      <div><dt>Gap</dt><dd>3 years → 10 days</dd></div>
+      <div><dt>Lives</dt><dd>3</dd></div>
+      <div><dt>The year</dt><dd>Counts</dd></div>
+    </dl>
 
     <p class="fine" id="data-count"></p>
   </section>
@@ -50,20 +61,20 @@
   <!-- LEVEL -->
   <section id="screen-level" class="screen" hidden>
     <div class="level-layout">
-      <ol class="ladder" id="ladder" aria-label="Level">
-        <li data-rung="10">10</li><li data-rung="9">9</li><li data-rung="8">8</li><li data-rung="7">7</li><li data-rung="6">6</li>
-        <li data-rung="5">5</li><li data-rung="4">4</li><li data-rung="3">3</li><li data-rung="2">2</li><li data-rung="1">1</li>
-      </ol>
+      <div class="status">
+        <ol class="ladder" id="ladder" aria-label="Level">
+          <li data-rung="1">1</li><li data-rung="2">2</li><li data-rung="3">3</li><li data-rung="4">4</li><li data-rung="5">5</li>
+          <li data-rung="6">6</li><li data-rung="7">7</li><li data-rung="8">8</li><li data-rung="9">9</li><li data-rung="10">10</li>
+        </ol>
+        <div class="lives" id="lives" aria-label="Lives"><span></span><span></span><span></span></div>
+      </div>
 
       <div class="level-main">
-        <div class="status">
-          <div class="level-name" id="level-name">Level 1</div>
-          <div class="lives" id="lives" aria-label="Lives"><span>🍺</span><span>🍺</span><span>🍺</span></div>
-        </div>
+        <div class="level-name" id="level-name">Level 1</div>
 
         <div class="anchors">
           <article class="card" id="card-a"></article>
-          <div class="between" aria-hidden="true">→</div>
+          <div class="between" aria-hidden="true"><span>between</span></div>
           <article class="card" id="card-b"></article>
         </div>
 
@@ -87,6 +98,7 @@
 
   <!-- RUN OVER -->
   <section id="screen-over" class="screen" hidden>
+    <p class="eyebrow">Run over</p>
     <h2 class="title small-title" id="over-title"></h2>
     <p class="lede" id="over-sub"></p>
     <div class="arcade" id="hs-entry" hidden>
@@ -110,6 +122,7 @@
 
   <!-- HIGH SCORES -->
   <section id="screen-scores" class="screen" hidden>
+    <p class="eyebrow">This machine</p>
     <h2 class="title small-title">High scores</h2>
     <p class="lede">Top ten runs on this device. Arcade rules: reach the table, enter three letters.</p>
     <div class="arcade">
@@ -127,8 +140,9 @@
 
   <!-- ABOUT -->
   <section id="screen-about" class="screen" hidden>
+    <p class="eyebrow">Origin</p>
     <h2 class="title small-title">About</h2>
-    <p>It started in a pub. Someone noticed that Gloria Hunniford and Judith Chalmers were born impossibly close together. They weren't — 10 April 1940 and 10 October 1935 — but they were both born on the 10th, and after four pints that was enough. The game that followed: name someone born between two birthdays, and keep making the gap smaller.</p>
+    <p class="prose">It started in a pub. Someone noticed that Gloria Hunniford and Judith Chalmers were born impossibly close together. They weren't — 10 April 1940 and 10 October 1935 — but they were both born on the 10th, and after four pints that was enough. The game that followed: name someone born between two birthdays, and keep making the gap smaller.</p>
     <h3 class="h3">How it works</h3>
     <ul class="rules">
       <li>Ten levels. The gap between the two birthdays starts at three years and closes to ten days: three years, a year, six months, three months, two months, six weeks, a month, three weeks, a fortnight, ten days.</li>
