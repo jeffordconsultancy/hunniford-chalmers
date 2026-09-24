@@ -1,6 +1,6 @@
 # Hunniford Chalmers
 
-The pub birthday game. Two famous people, two birthdays. Name someone born *between* them. Ten levels; the gap shrinks from three years to ten days.
+The pub birthday game. Two famous people, two birthdays. Name someone born *between* them. Ten levels; the gap shrinks from ten years to ten days.
 
 No backend, no API keys, no accounts, no build step. Open `index.html` or host the folder anywhere static.
 
@@ -13,18 +13,18 @@ No backend, no API keys, no accounts, no build step. Open `index.html` or host t
 
 | Level | Gap between the two birthdays |
 |---|---|
-| 1 | three years (1,095 days) |
-| 2 | a year (365) |
-| 3 | six months (182) |
-| 4 | three months (91) |
-| 5 | two months (61) |
-| 6 | six weeks (42) |
-| 7 | a month (30) |
-| 8 | three weeks (21) |
-| 9 | a fortnight (14) |
+| 1 | ten years (3,650 days) |
+| 2 | five years (1,826) |
+| 3 | three years (1,095) |
+| 4 | eighteen months (548) |
+| 5 | a year (365) |
+| 6 | six months (182) |
+| 7 | three months (91) |
+| 8 | six weeks (42) |
+| 9 | three weeks (21) |
 | 10 | ten days (10) |
 
-Anchor B is born between that many days and about 15% more after anchor A (ten days → 10–12; three years → up to about 3y 2m), and a pair is only used when at least three people on the list are born strictly between them. Anchors are chosen by **pub fame, not world fame**: British, on the telly (presenters, personalities, soap and sitcom actors, comedians, pop singers), and not too famous — fame counts against you above ~60 Wikipedia languages, and politicians, academics, novelists and the like are effectively excluded. See `anchorWeight` in `app.js`; `WINDOWS`/`LABELS` set the ladder.
+Anchor B is born between that many days and about 15% more after anchor A (ten days → 10–12; ten years → up to about 11½), and a pair is only used when at least three people on the list are born strictly between them. Anchors are chosen by **pub fame, not world fame**: British, on the telly (presenters, personalities, soap and sitcom actors, comedians, pop singers), and not too famous — fame counts against you above ~60 Wikipedia languages, and politicians, academics, novelists and the like are effectively excluded. See `anchorWeight` in `app.js`; `WINDOWS`/`LABELS` set the ladder.
 
 ### High scores
 
