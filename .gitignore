@@ -1,0 +1,4 @@
+dist/
+data/years/
+node_modules/
+.DS_Store

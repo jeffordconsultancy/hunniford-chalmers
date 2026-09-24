@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hunniford Chalmers</title>
+<meta name="description" content="The pub birthday game. Two famous people, two birthdays. Name someone born between them. Ten levels, from three years apart down to ten days.">
+<meta name="theme-color" content="#0f2a1f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f2a1f'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23e8a33d' font-family='Georgia,serif' font-weight='bold'%3EHC%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <a href="#" class="brand" data-go="home">Hunniford <span>Chalmers</span></a>
+  <button class="link small" data-go="about">About</button>
+</header>
+
+<main id="app">
+
+  <!-- HOME -->
+  <section id="screen-home" class="screen">
+    <h1 class="title">Hunniford<br>Chalmers</h1>
+    <p class="lede">Two famous people, two birthdays. Name someone born <em>between</em> them. Ten levels, from three years apart down to ten days.</p>
+
+    <div class="home-actions">
+      <button class="btn primary big" data-action="play">Play</button>
+      <button class="btn big" data-action="daily" id="btn-daily">Daily</button>
+    </div>
+
+    <p class="fine" id="data-count"></p>
+  </section>
+
+  <!-- LEVEL -->
+  <section id="screen-level" class="screen" hidden>
+    <div class="level-layout">
+      <ol class="ladder" id="ladder" aria-label="Level">
+        <li data-rung="10">10</li><li data-rung="9">9</li><li data-rung="8">8</li><li data-rung="7">7</li><li data-rung="6">6</li>
+        <li data-rung="5">5</li><li data-rung="4">4</li><li data-rung="3">3</li><li data-rung="2">2</li><li data-rung="1">1</li>
+      </ol>
+
+      <div class="level-main">
+        <div class="status">
+          <div class="level-name" id="level-name">Level 1</div>
+          <div class="lives" id="lives" aria-label="Lives"><span>🍺</span><span>🍺</span><span>🍺</span></div>
+        </div>
+
+        <div class="anchors">
+          <article class="card" id="card-a"></article>
+          <div class="between" aria-hidden="true">→</div>
+          <article class="card" id="card-b"></article>
+        </div>
+
+        <p class="prompt" id="prompt"></p>
+
+        <div class="search">
+          <input id="guess" type="text" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Type a name…" aria-label="Your guess" aria-autocomplete="list" aria-controls="suggest">
+          <ul id="suggest" class="suggest" role="listbox" hidden></ul>
+        </div>
+        <p class="note" id="note" aria-live="polite"></p>
+
+        <button class="link small" data-action="giveup">Give up</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT FLASH -->
+  <div id="flash" class="flash" hidden>
+    <div class="flash-inner" id="flash-inner"></div>
+  </div>
+
+  <!-- RUN OVER -->
+  <section id="screen-over" class="screen" hidden>
+    <h2 class="title small-title" id="over-title"></h2>
+    <p class="lede" id="over-sub"></p>
+    <div class="anchors compact" id="over-anchors"></div>
+    <h3 class="h3">You could have said</h3>
+    <ul class="answers" id="over-answers"></ul>
+    <div class="home-actions">
+      <button class="btn primary big" data-action="again">Play again</button>
+      <button class="btn big" data-action="share" id="btn-share">Share</button>
+    </div>
+    <pre class="share-preview" id="share-preview" hidden></pre>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="screen-about" class="screen" hidden>
+    <h2 class="title small-title">About</h2>
+    <p>It started in a pub. Someone noticed that Gloria Hunniford and Judith Chalmers were born impossibly close together. They weren't — 10 April 1940 and 10 October 1935 — but they were both born on the 10th, and after four pints that was enough. The game that followed: name someone born between two birthdays, and keep making the gap smaller.</p>
+    <h3 class="h3">How it works</h3>
+    <ul class="rules">
+      <li>Ten levels. The gap between the two birthdays starts at three years and closes to ten days: three years, a year, six months, three months, two months, six weeks, a month, three weeks, a fortnight, ten days.</li>
+      <li>The <strong>year counts</strong>. Born on the same day as either anchor doesn't count. Strictly between.</li>
+      <li>Three lives. A wrong birthday costs one. A name we don't have costs nothing.</li>
+      <li>The list is the referee. It's a few thousand well-known people from Wikidata. If someone's missing, they're missing — argue in the pub, not with the website.</li>
+    </ul>
+    <h3 class="h3">Credits</h3>
+    <p class="fine">Names, birthdays and descriptions from <a href="https://www.wikidata.org" rel="noopener">Wikidata</a> (CC0). Photos from <a href="https://commons.wikimedia.org" rel="noopener">Wikimedia Commons</a>; each photo links to its source page and licence. Not affiliated with, endorsed by or connected to either presenter.</p>
+    <button class="btn" data-go="home">Back</button>
+  </section>
+
+</main>
+
+<script src="data/people.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
